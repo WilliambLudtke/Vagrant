@@ -2,7 +2,7 @@
 - hosts: db
   become: yes
   tasks:
-    - name: 'Instalação de Pactotes BD'
+    - name: Instalação de Pactotes BD
       apt:
         pkg:
           - mariadb-server
@@ -11,3 +11,43 @@
           - curl
           - python3-mysqldb
         state: present
+    - name: Download e extração DB
+      unarchive:
+        src: https://github.com/rogerramossilva/devops/raw/master/db.zip
+        dest: /tmp
+        remote_src: yes
+    - name: Criando DB Backup
+      mysql_db:
+        name: bacnkup
+        login_user: root
+        login_password: ""
+        state: present
+    - name: Importação Base de Dados backup.sql
+      mysql_db:
+        login_user: root
+        login_password: ""
+        state: import
+        name: backup
+        target: /tmp/backup.sql
+    - name: Criação de usuario express
+      mysql_user:
+        host: "%"
+        login_user: root
+        login_password: ""
+        name: express
+        password: coroinha
+        priv: backup.*:ALL
+        state: present
+      notify: Restart Mysql
+    - name: Subistituir bind do Mysql
+      replace:
+        path: /etc/mysql/mariadb.conf.d/50-server.cnf
+        regexp: 127\.0\.0\.1
+        replace: 0.0.0.0
+      notify: Restart Mysql
+  handlers:
+    - name: Restart Mysql
+      service:
+        name: mysql
+        state: restarted
+        enabled: yes
