@@ -1,5 +1,5 @@
 ---
-- hosts: intranet
+- hosts: web
   become: true
   vars_files:
     - vars/default.yml
@@ -8,15 +8,15 @@
       become: yes
       apt:
         pkg:
-          - php7.0
+          - php7.4
           - php-pear
-          - php7.0-curl
-          - php7.0-gd
-          - php7.0-intl
-          - php7.0-xmlrpc
-          - php7.0-mysql
+          - php7.4-curl
+          - php7.4-gd
+          - php7.4-intl
+          - php7.4-xmlrpc
+          - php7.4-mysql
           - apache2
-          - python-mysqldb
+          - python3-mysqldb
           - wget
           - zip
           - curl
@@ -39,7 +39,7 @@
       replace:
         path: /srv/www/express/backup.php
         regexp: '192\.168\.1\.20'
-        replace: '172.17.177.42'
+        replace: '172.17.177.102'
     - name: 'Criando virtual host para pagina express.asf.com'
       template:
         src: "files/express.conf"
@@ -50,7 +50,7 @@
         dest: "/etc/apache2/conf-available/direxpress.conf"
     - name: 'Entrada DNS arquivo /etc/hosts'
       template:
-        src: "files/hostsintranet.conf"
+        src: "files/hostsweb.conf"
         dest: "/etc/hosts"
     - name: 'Habilitar Site'
       shell: /usr/sbin/a2ensite {{ http_conf }}
@@ -61,7 +61,7 @@
     - name: 'Habilitar Modulo php7'
       apache2_module:
         state: present
-        name: php7.0
+        name: php7.4
       notify: Reload Apache
     - name: 'Habilitar Modulo Virtual Host'
       apache2_module:
