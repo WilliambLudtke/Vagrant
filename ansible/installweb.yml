@@ -3,6 +3,7 @@
   become: true
   vars_files:
     - vars/default.yml
+  gather_facts: true
   tasks:
     - name: 'Instalação de pacotes webserver'
       become: yes
@@ -22,6 +23,7 @@
           - curl
           - vim
         state: present
+      when: ansible_os_family == 'Debian'
     - name: 'Diretorio do webserver'
       become: yes
       file: 
