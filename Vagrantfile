@@ -38,4 +38,15 @@ Vagrant.configure("2") do |config|
 		vb.cpus = 2
         end 
     end
+        config.vm.define "puppet" do |puppet|
+		puppet.vm.box = "shekeriev/debian-11"
+		puppet.vm.hostname = "puppet"
+		puppet.vm.network "private_network", ip: "172.17.177.200"
+		puppet.vm.provider "virtualbox" do |vb|
+			vb.name = "puppet"
+			vb.memory = "4096"
+			vb.cpus = 2
+	end
+	puppet.vm.provision "shell", inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+    end
 end
